@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Models\Contracts\HasAvatar;
-use Filament\Models\Contracts\HasName;
-use Filament\Panel;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Orchid\Screen\Contracts\Personable;
+use Orchid\Support\Presenter;
 
-class AdminUser implements Authenticatable, FilamentUser, HasAvatar, HasName
+class AdminUser implements Authenticatable
 {
     public function __construct(
         public int $id,
@@ -56,19 +54,45 @@ class AdminUser implements Authenticatable, FilamentUser, HasAvatar, HasName
         );
     }
 
-    public function canAccessPanel(Panel $panel): bool
+    /**
+     * Every user retrieved through the remote API's admin login already
+     * passed that check server-side — there is no local permission system,
+     * so any authenticated admin has full access to every screen.
+     */
+    public function hasAccess(string $permit, bool $cache = true): bool
     {
-        return in_array($this->role, ['admin', 'super_admin'], true);
+        return true;
     }
 
-    public function getFilamentName(): string
+    public function hasAnyAccess($permissions, bool $cache = true): bool
     {
-        return $this->name;
+        return true;
     }
 
-    public function getFilamentAvatarUrl(): ?string
+    public function presenter(): Presenter
     {
-        return $this->profileImage ?: null;
+        return new class($this) extends Presenter implements Personable {
+            public function title(): string
+            {
+                return $this->entity->name;
+            }
+
+            public function subTitle(): string
+            {
+                return ucfirst($this->entity->role);
+            }
+
+            public function url(): string
+            {
+                return route('platform.profile');
+            }
+
+            public function image(): ?string
+            {
+                return $this->entity->profileImage
+                    ?: 'https://ui-avatars.com/api/?name=' . urlencode($this->entity->name) . '&color=000000&background=C9D9AE';
+            }
+        };
     }
 
     public function getKey(): int

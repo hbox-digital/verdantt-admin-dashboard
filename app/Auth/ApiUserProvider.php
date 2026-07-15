@@ -69,6 +69,21 @@ class ApiUserProvider implements UserProvider
         //
     }
 
+    /**
+     * Orchid's LoginController expects an Eloquent-style provider so it can
+     * look up the "remember this device" lock-screen user by id. We have no
+     * local user table, so this always reports no cached lock-screen user.
+     */
+    public function createModel(): object
+    {
+        return new class {
+            public function find($id): null
+            {
+                return null;
+            }
+        };
+    }
+
     protected function tokenTtl(string $token): \DateTimeInterface
     {
         $parts = explode('.', $token);

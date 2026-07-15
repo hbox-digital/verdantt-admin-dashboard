@@ -1,0 +1,167 @@
+/* Verdantt color scheme applied on top of Orchid's Bootstrap 5 theme. */
+
+:root,
+[data-bs-theme="dark"] {
+    --bs-dark: #1F3A2E;
+    --bs-dark-rgb: 31, 58, 46;
+}
+
+:root {
+    --bs-primary: #1F3A2E;
+    --bs-primary-rgb: 31, 58, 46;
+    --bs-success: #4E7C59;
+    --bs-success-rgb: 78, 124, 89;
+    --bs-danger: #B3543F;
+    --bs-danger-rgb: 179, 84, 63;
+    --bs-nav-pills-link-active-bg: #4E7C59;
+}
+
+body {
+    background-color: #F7F3E9;
+}
+
+.aside {
+    background-color: #1F3A2E !important;
+}
+
+.aside .nav-link {
+    color: #C9D9AE;
+}
+
+.aside .nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.aside .nav-link.active {
+    color: #ffffff;
+}
+
+.btn-primary {
+    background-color: #1F3A2E;
+    border-color: #1F3A2E;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #16281f;
+    border-color: #16281f;
+}
+
+.btn-outline-primary {
+    color: #1F3A2E;
+    border-color: #1F3A2E;
+}
+
+.btn-outline-primary:hover {
+    background-color: #1F3A2E;
+    border-color: #1F3A2E;
+}
+
+.badge.bg-primary {
+    background-color: #1F3A2E !important;
+}
+
+.badge.bg-success {
+    background-color: #4E7C59 !important;
+}
+
+.border-primary {
+    border-color: #1F3A2E !important;
+}
+
+.text-primary {
+    color: #1F3A2E !important;
+}
+
+a {
+    color: #1F3A2E;
+}
+
+/* Orchid caps content at ~1120px and gives the sidebar a full Bootstrap
+   grid column (up to ~320px), which leaves a large dead zone on wide
+   screens. Narrow the sidebar and let content use the freed-up space. */
+@media (min-width: 992px) {
+    .aside {
+        flex: 0 0 300px !important;
+        max-width: 300px !important;
+        width: 300px !important;
+    }
+}
+
+/* Orchid caps the workspace content at ~1120px via .workspace-limit, and
+   separately caps its outer wrapper .container-xl at a fixed 1140px above
+   the xl breakpoint. Both are removed so content always fills the full
+   width next to the sidebar, with no dead zone on wide screens. */
+.workspace-limit,
+.container-xl {
+    max-width: 100% !important;
+}
+
+/* The logo's white contrast band (see header.blade.php override) — used
+   on the login page only; the sidebar shows the profile card instead of
+   a logo (see dashboard.blade.php). */
+.logo-band {
+    padding: 0.375rem 0.75rem;
+}
+
+.logo-band img {
+    max-height: 2rem;
+    width: auto;
+}
+
+@media (min-width: 992px) {
+    .logo-band {
+        padding: 1.25rem 1rem;
+    }
+
+    .logo-band img {
+        max-height: 4.5rem;
+    }
+}
+
+/* Mobile-app-style sidebar: profile card + icon badges on each nav item. */
+.profile-card {
+    background-color: rgba(255, 255, 255, 0.08);
+    transition: background-color 0.15s ease-in-out;
+}
+
+.profile-card:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.aside .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.6rem 1rem;
+}
+
+.aside .nav-item + .nav-item {
+    margin-top: 0.35rem;
+}
+
+.aside .nav-link svg {
+    box-sizing: border-box;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 0.65rem;
+    flex-shrink: 0;
+}
+
+.aside .nav-link.active svg,
+.aside .nav-link:hover svg {
+    background-color: rgba(255, 255, 255, 0.16);
+}
+
+/* The Logout nav item is a <button> inside a <form>, styled to match the
+   regular <a class="nav-link"> items exactly (see dashboard.blade.php). */
+.aside form button.nav-link {
+    color: #C9D9AE;
+}
+
+.aside form button.nav-link:hover {
+    color: #ffffff;
+}
