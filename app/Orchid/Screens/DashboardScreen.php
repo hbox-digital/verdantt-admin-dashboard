@@ -14,6 +14,7 @@ class DashboardScreen extends Screen
         $client = app(VerdanttApiClient::class);
         $data = $client->get('/admin/dashboard')->json('data') ?? [];
         $users = $data['users'] ?? [];
+        $growthSeries = $data['user_growth']['series'] ?? [];
 
         // The dashboard endpoint doesn't report these yet, so they're
         // counted from their own list endpoints instead.
@@ -74,6 +75,14 @@ class DashboardScreen extends Screen
                     'labels' => ['Pantry Items', 'Grocery Items', 'Active Subscriptions', 'Notifications Sent'],
                 ],
             ],
+
+            'userGrowthChart' => [
+                [
+                    'name' => 'New Users',
+                    'values' => array_map(fn ($item) => $item['total'] ?? 0, $growthSeries),
+                    'labels' => array_map(fn ($item) => $item['label'] ?? '', $growthSeries),
+                ],
+            ],
         ];
     }
 
@@ -109,6 +118,10 @@ class DashboardScreen extends Screen
 
             Layout::chart('activityChart', 'Platform Activity')
                 ->type(Chart::TYPE_BAR)
+                ->height(280),
+
+            Layout::chart('userGrowthChart', 'User Growth (Monthly)')
+                ->type(Chart::TYPE_LINE)
                 ->height(280),
         ];
     }

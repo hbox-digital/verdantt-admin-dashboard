@@ -49,6 +49,11 @@ class RecipeEditLayout extends Rows
 
             Input::make('recipe.cookbook_title')->title('Cookbook title'),
 
+            Input::make('recipe.source')
+                ->title('Source')
+                ->type('url')
+                ->help('Original recipe URL (optional)'),
+
             Input::make('recipe.dietary_restrictions')
                 ->title('Dietary restrictions')
                 ->help('Comma-separated, e.g. Vegetarian, Gluten-Free'),

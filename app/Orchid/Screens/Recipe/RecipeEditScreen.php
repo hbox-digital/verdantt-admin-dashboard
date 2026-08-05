@@ -188,6 +188,7 @@ class RecipeEditScreen extends Screen
             'dietary_restrictions' => $recipe['dietary_restrictions'] ?? '',
             'ingredient_allergens' => $recipe['ingredient_allergens'] ?? '',
             'cookbook_title' => $recipe['cookbook_title'] ?? '',
+            'source' => $recipe['source'] ?? '',
             'keywords' => $recipe['keywords'] ?? '',
         ];
     }
