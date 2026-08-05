@@ -34,7 +34,7 @@ class ApiTableData
 
             $items = $items->filter(function ($item) use ($needle, $searchableFields) {
                 foreach ($searchableFields as $field) {
-                    if (Str::contains(Str::lower((string) data_get($item, $field)), $needle)) {
+                    if (Str::contains(Str::lower(self::stringify(data_get($item, $field))), $needle)) {
                         return true;
                     }
                 }
@@ -57,5 +57,16 @@ class ApiTableData
         return new LengthAwarePaginator($slice, $total, $perPage, $page, [
             'path' => LengthAwarePaginator::resolveCurrentPath(),
         ]);
+    }
+
+    private static function stringify(mixed $value): string
+    {
+        if (is_array($value)) {
+            return collect($value)
+                ->map(fn ($item) => is_array($item) ? ($item['name'] ?? json_encode($item)) : $item)
+                ->implode(' ');
+        }
+
+        return (string) ($value ?? '');
     }
 }
