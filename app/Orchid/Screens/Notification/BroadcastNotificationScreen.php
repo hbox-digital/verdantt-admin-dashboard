@@ -43,12 +43,17 @@ class BroadcastNotificationScreen extends Screen
             Layout::rows([
                 Radio::make('notification.audience')
                     ->title('Send to')
-                    ->options([
-                        'all' => 'All users',
-                        'paid' => 'Premium (paid) users',
-                        'unpaid' => 'Free users',
-                    ])
+                    ->value('all')
+                    ->placeholder('All users')
                     ->required(),
+
+                Radio::make('notification.audience')
+                    ->value('paid')
+                    ->placeholder('Premium (paid) users'),
+
+                Radio::make('notification.audience')
+                    ->value('unpaid')
+                    ->placeholder('Free users'),
 
                 Input::make('notification.title')
                     ->title('Title')

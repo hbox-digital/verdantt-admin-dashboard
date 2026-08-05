@@ -31,6 +31,8 @@ class RecipeEditScreen extends Screen
             if ($data === null) {
                 throw new NotFoundHttpException('Recipe not found.');
             }
+
+            $data = $this->normalizeRecipeData($data);
         }
 
         $this->recipe = $data;
@@ -75,12 +77,23 @@ class RecipeEditScreen extends Screen
     public function save(Request $request, ?string $recipe = null): RedirectResponse
     {
         $client = app(VerdanttApiClient::class);
-        $fields = $this->apiFields($request->input('recipe', []), $request->input('ingredients', []));
-        $files = ['image' => $request->file('image')];
+        $fields = $this->apiFields($request->input('recipe', []));
+        $ingredients = $this->apiIngredients($request->input('ingredients', []));
+        $image = $request->file('image');
 
-        $response = $recipe !== null
-            ? $client->postMultipart("/admin/recipes/{$recipe}", $fields, $files, 'PUT')
-            : $client->postMultipart('/admin/recipes', $fields, $files);
+        if ($image) {
+            $multipartFields = $fields + ['ingredients' => json_encode($ingredients)];
+
+            $response = $recipe !== null
+                ? $client->postMultipart("/admin/recipes/{$recipe}", $multipartFields, ['image' => $image], 'PUT')
+                : $client->postMultipart('/admin/recipes', $multipartFields, ['image' => $image]);
+        } else {
+            $jsonFields = $fields + ['ingredients' => $ingredients];
+
+            $response = $recipe !== null
+                ? $client->put("/admin/recipes/{$recipe}", $jsonFields)
+                : $client->post('/admin/recipes', $jsonFields);
+        }
 
         if (! $response->successful()) {
             Toast::error($response->json('message') ?? 'The API request failed.');
@@ -131,30 +144,39 @@ class RecipeEditScreen extends Screen
         return null;
     }
 
+    protected function normalizeRecipeData(array $data): array
+    {
+        foreach (['appliance', 'appliance_substitute', 'dietary_restrictions', 'ingredient_allergens', 'keywords'] as $field) {
+            if (array_key_exists($field, $data)) {
+                $data[$field] = $this->stringifyListField($data[$field]);
+            }
+        }
+
+        return $data;
+    }
+
+    protected function stringifyListField(mixed $value): string
+    {
+        if (is_array($value)) {
+            return collect($value)
+                ->map(fn ($item) => is_array($item) ? ($item['name'] ?? json_encode($item)) : $item)
+                ->implode(', ');
+        }
+
+        return (string) ($value ?? '');
+    }
+
     protected function ingredientOptions(): Collection
     {
         return collect(app(VerdanttApiClient::class)->get('/admin/ingredients')->json('data') ?? []);
     }
 
-    protected function apiFields(array $recipe, array $ingredients): array
+    protected function apiFields(array $recipe): array
     {
-        $ingredients = collect($ingredients)
-            ->filter(fn (array $row) => filled($row['ingredient_id'] ?? null))
-            ->map(fn (array $row) => [
-                'ingredient_id' => (int) $row['ingredient_id'],
-                'quantity' => filled($row['quantity'] ?? null) ? (float) $row['quantity'] : null,
-                'quantity_label' => $row['quantity_label'] ?? null,
-                'unit' => $row['unit'] ?? null,
-                'prefix' => $row['prefix'] ?? null,
-                'notes' => $row['notes'] ?? null,
-                'is_optional' => filled($row['is_optional'] ?? null),
-            ])
-            ->values()
-            ->all();
-
         return [
             'title' => $recipe['title'] ?? '',
-            'description' => $recipe['description'] ?? '',
+            // Description is hidden from the form; keep whatever the recipe already had.
+            'description' => $this->recipe['description'] ?? '',
             'instructions' => $recipe['instructions'] ?? '',
             'prep_time' => $recipe['prep_time'] ?? '',
             'prep_unit' => $recipe['prep_unit'] ?? '',
@@ -167,7 +189,23 @@ class RecipeEditScreen extends Screen
             'ingredient_allergens' => $recipe['ingredient_allergens'] ?? '',
             'cookbook_title' => $recipe['cookbook_title'] ?? '',
             'keywords' => $recipe['keywords'] ?? '',
-            'ingredients' => json_encode($ingredients),
         ];
+    }
+
+    protected function apiIngredients(array $ingredients): array
+    {
+        return collect($ingredients)
+            ->filter(fn (array $row) => filled($row['ingredient_id'] ?? null))
+            ->map(fn (array $row) => [
+                'ingredient_id' => (int) $row['ingredient_id'],
+                'quantity' => filled($row['quantity'] ?? null) ? (float) $row['quantity'] : null,
+                'quantity_label' => $row['quantity_label'] ?? null,
+                'unit' => $row['unit'] ?? null,
+                'prefix' => $row['prefix'] ?? null,
+                'notes' => $row['notes'] ?? null,
+                'is_optional' => filled($row['is_optional'] ?? null),
+            ])
+            ->values()
+            ->all();
     }
 }

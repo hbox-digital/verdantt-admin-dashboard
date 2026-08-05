@@ -25,8 +25,6 @@ class IngredientLifespanLayout extends Rows
                 Input::make('lifespan.spoiled_days')->type('number')->title('Spoiled days'),
             ]),
 
-            Input::make('lifespan.ideal_storage')->title('Ideal storage'),
-
             Input::make('lifespan.image_url')->title('Lifespan image URL')->type('url'),
         ];
     }

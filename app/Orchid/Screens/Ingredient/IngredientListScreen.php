@@ -92,10 +92,12 @@ class IngredientListScreen extends Screen
     {
         $id = $request->get('id');
         $data = $request->input('ingredient', []);
+        $existing = $id ? $this->findIngredient($id) : null;
 
         $payload = [
             'name' => $data['name'] ?? '',
-            'category' => $data['category'] ?? null,
+            // Category is hidden from the form; keep whatever the ingredient already had.
+            'category' => $existing['category'] ?? null,
             'image_url' => $data['image_url'] ?? null,
             'is_produce' => filled($data['is_produce'] ?? null),
         ];
@@ -118,13 +120,15 @@ class IngredientListScreen extends Screen
     {
         $id = $request->get('id');
         $data = $request->input('lifespan', []);
+        $existing = $id ? $this->findIngredient($id) : null;
 
         $response = app(VerdanttApiClient::class)->put("/admin/ingredients/{$id}/lifespan", [
             'unripe_days' => filled($data['unripe_days'] ?? null) ? (int) $data['unripe_days'] : null,
             'ripe_days' => filled($data['ripe_days'] ?? null) ? (int) $data['ripe_days'] : null,
             'overripe_days' => filled($data['overripe_days'] ?? null) ? (int) $data['overripe_days'] : null,
             'spoiled_days' => filled($data['spoiled_days'] ?? null) ? (int) $data['spoiled_days'] : null,
-            'ideal_storage' => $data['ideal_storage'] ?? null,
+            // Ideal storage is hidden from the form; keep whatever it already had.
+            'ideal_storage' => $existing['lifespan']['ideal_storage'] ?? null,
             'image_url' => $data['image_url'] ?? null,
         ]);
 

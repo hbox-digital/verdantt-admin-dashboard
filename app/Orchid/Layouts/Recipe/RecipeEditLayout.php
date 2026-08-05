@@ -5,6 +5,7 @@ namespace App\Orchid\Layouts\Recipe;
 use Orchid\Screen\Field;
 use Orchid\Screen\Fields\Group;
 use Orchid\Screen\Fields\Input;
+use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Screen\Layouts\Rows;
 
@@ -21,25 +22,29 @@ class RecipeEditLayout extends Rows
                 ->required()
                 ->max(255),
 
-            TextArea::make('recipe.description')
-                ->title('Description')
-                ->rows(3),
-
             TextArea::make('recipe.instructions')
                 ->title('Instructions')
                 ->rows(6),
 
             Group::make([
                 Input::make('recipe.prep_time')->type('number')->title('Prep time'),
-                Input::make('recipe.prep_unit')->title('Prep unit')->value('minutes'),
+                Select::make('recipe.prep_unit')
+                    ->title('Prep unit')
+                    ->options(['minutes' => 'Minutes', 'hours' => 'Hours']),
                 Input::make('recipe.cook_time')->type('number')->title('Cook time'),
-                Input::make('recipe.cook_unit')->title('Cook unit')->value('minutes'),
+                Select::make('recipe.cook_unit')
+                    ->title('Cook unit')
+                    ->options(['minutes' => 'Minutes', 'hours' => 'Hours']),
             ]),
 
             Group::make([
                 Input::make('recipe.servings')->type('number')->title('Servings'),
-                Input::make('recipe.appliance')->title('Appliance'),
-                Input::make('recipe.appliance_substitute')->title('Appliance substitute'),
+                Input::make('recipe.appliance')
+                    ->title('Appliance')
+                    ->help('Comma-separated, e.g. Oven, Stovetop'),
+                Input::make('recipe.appliance_substitute')
+                    ->title('Appliance substitute')
+                    ->help('Comma-separated, e.g. Air fryer, Microwave'),
             ]),
 
             Input::make('recipe.cookbook_title')->title('Cookbook title'),

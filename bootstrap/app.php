@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             RedirectIfAdminAuthenticated::class,
         ]);
+        $middleware->trustProxies(at: [
+            '172.18.0.0/16',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

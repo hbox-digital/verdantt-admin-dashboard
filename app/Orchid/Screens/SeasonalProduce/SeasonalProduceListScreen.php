@@ -109,22 +109,6 @@ class SeasonalProduceListScreen extends Screen
         Toast::info($id ? 'Seasonal produce updated.' : 'Seasonal produce created.');
     }
 
-    public function toggleActive(Request $request): void
-    {
-        $response = app(VerdanttApiClient::class)->patch(
-            '/admin/seasonal-produce/' . $request->get('id'),
-            ['isActive' => ! $request->boolean('isActive')],
-        );
-
-        if (! $response->successful()) {
-            Toast::error($response->json('message') ?? 'Failed to update status.');
-
-            return;
-        }
-
-        Toast::info('Status updated.');
-    }
-
     public function remove(Request $request): void
     {
         $response = app(VerdanttApiClient::class)->delete('/admin/seasonal-produce/' . $request->get('id'));

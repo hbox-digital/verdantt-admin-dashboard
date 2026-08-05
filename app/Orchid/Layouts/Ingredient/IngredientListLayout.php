@@ -25,9 +25,6 @@ class IngredientListLayout extends Table
                 ->sort()
                 ->render(fn ($ingredient) => e($ingredient['name'] ?? '')),
 
-            TD::make('category', 'Category')
-                ->render(fn ($ingredient) => $ingredient['category'] ?? '—'),
-
             TD::make('is_produce', 'Produce')
                 ->render(fn ($ingredient) => ! empty($ingredient['is_produce'])
                     ? '<span class="badge bg-success">Yes</span>'

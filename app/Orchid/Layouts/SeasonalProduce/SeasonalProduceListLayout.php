@@ -30,11 +30,6 @@ class SeasonalProduceListLayout extends Table
             TD::make('month', 'Month')
                 ->render(fn ($item) => self::$months[(int) ($item['month'] ?? 0)] ?? '—'),
 
-            TD::make('isActive', 'Status')
-                ->render(fn ($item) => ! empty($item['isActive'])
-                    ? '<span class="badge bg-success">Active</span>'
-                    : '<span class="badge bg-secondary">Inactive</span>'),
-
             TD::make('actions', 'Actions')
                 ->align(TD::ALIGN_CENTER)
                 ->width('100px')
@@ -47,10 +42,6 @@ class SeasonalProduceListLayout extends Table
                             ->modalTitle('Edit seasonal produce')
                             ->method('save')
                             ->asyncParameters(['id' => $item['id']]),
-
-                        Button::make(! empty($item['isActive']) ? 'Deactivate' : 'Activate')
-                            ->icon('bs.toggle2-on')
-                            ->method('toggleActive', ['id' => $item['id'], 'isActive' => ! empty($item['isActive'])]),
 
                         Button::make('Delete')
                             ->icon('bs.trash3')

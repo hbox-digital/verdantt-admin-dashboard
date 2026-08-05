@@ -20,9 +20,6 @@ class IngredientEditLayout extends Rows
                 ->required()
                 ->max(255),
 
-            Input::make('ingredient.category')
-                ->title('Category'),
-
             Input::make('ingredient.image_url')
                 ->title('Image URL')
                 ->type('url'),
