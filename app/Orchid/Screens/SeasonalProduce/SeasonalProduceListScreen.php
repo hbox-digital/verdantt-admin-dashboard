@@ -86,13 +86,15 @@ class SeasonalProduceListScreen extends Screen
     {
         $id = $request->get('id');
         $data = $request->input('produceItem', []);
+        $existing = $id ? $this->find($id) : null;
 
         $payload = [
             'produceName' => $data['produceName'] ?? '',
             'ingredientId' => filled($data['ingredientId'] ?? null) ? (int) $data['ingredientId'] : null,
             'season' => $data['season'] ?? null,
             'month' => filled($data['month'] ?? null) ? (int) $data['month'] : null,
-            'isActive' => filled($data['isActive'] ?? null),
+            // Status is hidden from the form; keep whatever it already had (new items default active).
+            'isActive' => $existing !== null ? (bool) ($existing['isActive'] ?? true) : true,
         ];
 
         $client = app(VerdanttApiClient::class);

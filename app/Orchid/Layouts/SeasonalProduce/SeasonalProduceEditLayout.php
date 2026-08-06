@@ -4,7 +4,6 @@ namespace App\Orchid\Layouts\SeasonalProduce;
 
 use App\Services\VerdanttApiClient;
 use Orchid\Screen\Field;
-use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Layouts\Rows;
@@ -44,10 +43,6 @@ class SeasonalProduceEditLayout extends Rows
                     9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December',
                 ])
                 ->required(),
-
-            CheckBox::make('produceItem.isActive')
-                ->title('Status')
-                ->placeholder('Active (shown in the mobile app)'),
         ];
     }
 
