@@ -86,7 +86,7 @@ class SubscriptionListScreen extends Screen
         return [
             Layout::view('orchid.partials.search-box', [
                 'placeholder' => 'Search users...',
-                'debounce' => 300,
+                'debounce' => 800,
                 'focus' => true,
             ]),
 
