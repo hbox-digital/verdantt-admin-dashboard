@@ -42,6 +42,10 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.users')
                 ->title('Community'),
 
+            Menu::make('Subscriptions')
+                ->icon('bs.credit-card')
+                ->route('platform.subscriptions'),
+
             Menu::make('Recipes')
                 ->icon('bs.book')
                 ->route('platform.recipes')

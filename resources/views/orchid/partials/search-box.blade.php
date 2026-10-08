@@ -45,10 +45,28 @@
 (function () {
     const container = document.currentScript.previousElementSibling;
 
+    // Opt-in: pass `debounce` => 300 to auto-apply the search after the user
+    // stops typing for that many milliseconds. Defaults to 0 (manual apply).
+    const debounceMs = Number({{ (int) ($debounce ?? 0) }}) || 0;
+
+    // Opt-in: pass `focus` => true to put the caret back into the search field
+    // once the page has loaded. Required whenever `debounce` is used, because
+    // every auto-apply is a full page load and would otherwise drop focus.
+    const focusOnLoad = {{ ($focus ?? false) ? 'true' : 'false' }};
+
+    let debounceTimer = null;
+
+    const searchInput = container.querySelector('[data-role="search"]');
+
     function apply() {
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+            debounceTimer = null;
+        }
+
         const url = new URL(window.location.href);
 
-        const search = container.querySelector('[data-role="search"]').value;
+        const search = searchInput.value;
         if (search) {
             url.searchParams.set('search', search);
         } else {
@@ -70,11 +88,43 @@
     }
 
     container.querySelector('[data-role="apply"]').addEventListener('click', apply);
-    container.querySelector('[data-role="search"]').addEventListener('keydown', (e) => {
+    searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
             apply();
         }
     });
+
+    if (debounceMs > 0) {
+        searchInput.addEventListener('input', () => {
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+            }
+
+            debounceTimer = setTimeout(apply, debounceMs);
+        });
+    }
+
+    if (focusOnLoad) {
+        // Each debounced apply() above navigates with a full page load, which
+        // drops focus and the caret position. Claim them back once the page is
+        // ready — but never steal focus from a control that already has it
+        // (for example an Orchid modal opened on page load).
+        const refocus = () => {
+            const active = document.activeElement;
+
+            if (active === null || active === document.body || active === document.documentElement) {
+                searchInput.focus();
+                searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+            }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', refocus, { once: true });
+        } else {
+            // Give Turbo a frame to finish swapping the page in first.
+            window.requestAnimationFrame(refocus);
+        }
+    }
 })();
 </script>

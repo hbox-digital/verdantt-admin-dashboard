@@ -16,6 +16,7 @@ use App\Orchid\Screens\Recipe\RecipeEditScreen;
 use App\Orchid\Screens\Recipe\RecipeListScreen;
 use App\Orchid\Screens\RemoteUser\RemoteUserListScreen;
 use App\Orchid\Screens\SeasonalProduce\SeasonalProduceListScreen;
+use App\Orchid\Screens\Subscription\SubscriptionListScreen;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -66,6 +67,9 @@ Route::screen('contact-forms', ContactFormListScreen::class)
 
 Route::screen('users', RemoteUserListScreen::class)
     ->name('platform.users');
+
+Route::screen('subscriptions', SubscriptionListScreen::class)
+    ->name('platform.subscriptions');
 
 Route::screen('cms/terms', TermsScreen::class)
     ->name('platform.cms.terms');
