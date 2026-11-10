@@ -4,6 +4,7 @@ namespace App\Orchid\Screens\Recipe;
 
 use App\Orchid\Layouts\Recipe\RecipeEditLayout;
 use App\Services\VerdanttApiClient;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -81,18 +82,34 @@ class RecipeEditScreen extends Screen
         $ingredients = $this->apiIngredients($request->input('ingredients', []));
         $image = $request->file('image');
 
-        if ($image) {
-            $multipartFields = $fields + ['ingredients' => json_encode($ingredients)];
+        // PHP silently rejects files above upload_max_filesize but still hands
+        // back an (invalid) UploadedFile with no readable temp file.
+        if ($image && ! $image->isValid()) {
+            Toast::error('Image upload failed: '.$image->getErrorMessage());
 
-            $response = $recipe !== null
-                ? $client->postMultipart("/admin/recipes/{$recipe}", $multipartFields, ['image' => $image], 'PUT')
-                : $client->postMultipart('/admin/recipes', $multipartFields, ['image' => $image]);
-        } else {
-            $jsonFields = $fields + ['ingredients' => $ingredients];
+            return back()->withInput();
+        }
 
-            $response = $recipe !== null
-                ? $client->put("/admin/recipes/{$recipe}", $jsonFields)
-                : $client->post('/admin/recipes', $jsonFields);
+        try {
+            if ($image) {
+                $multipartFields = $fields + ['ingredients' => json_encode($ingredients)];
+
+                $response = $recipe !== null
+                    ? $client->postMultipart("/admin/recipes/{$recipe}", $multipartFields, ['image' => $image], 'PUT')
+                    : $client->postMultipart('/admin/recipes', $multipartFields, ['image' => $image]);
+            } else {
+                $jsonFields = $fields + ['ingredients' => $ingredients];
+
+                $response = $recipe !== null
+                    ? $client->put("/admin/recipes/{$recipe}", $jsonFields)
+                    : $client->post('/admin/recipes', $jsonFields);
+            }
+        } catch (ConnectionException $e) {
+            report($e);
+
+            Toast::error('The API did not respond in time. Please try again'.($image ? ' (a smaller image uploads faster).' : '.'));
+
+            return back()->withInput();
         }
 
         if (! $response->successful()) {

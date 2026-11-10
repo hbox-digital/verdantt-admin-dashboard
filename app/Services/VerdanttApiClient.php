@@ -72,10 +72,12 @@ class VerdanttApiClient
      */
     public function postMultipart(string $path, array $fields = [], array $files = [], string $method = 'POST'): Response
     {
-        $request = $this->request();
+        // File uploads go through the API's image processing/storage, which can
+        // easily exceed the default 30s on larger images.
+        $request = $this->request()->connectTimeout(10)->timeout(120);
 
         foreach ($files as $name => $file) {
-            if ($file instanceof UploadedFile) {
+            if ($file instanceof UploadedFile && $file->isValid()) {
                 $request = $request->attach($name, fopen($file->getRealPath(), 'r'), $file->getClientOriginalName());
             }
         }
